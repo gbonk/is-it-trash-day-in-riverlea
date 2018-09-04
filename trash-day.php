@@ -15,68 +15,103 @@ Is today Trash Day ?
 
 */
 
-function riverlea_is_trash_today( $atts, $content = null ) {
+function riverlea_trash_schedule( $atts, $content = null ) {
 
-  $today = (new DateTime())->format('m-d');
+  $today = new DateTime();
+  $tomorrow = new DateTime("tomorrow");
 
   $content .= "<p>";
   $content .= "Today is " . date("m/d/Y") . ", a " . date("l") . "<br>";
-  $content .= "Is today a Monday?  " . is_monday() . "<br>";
-  $content .= "Is today a holiday?  " . is_holiday( $today ) . "<br>";
-  $content .= "Is today trash day?  " . riverlea_well_is_it() . "<br>";
+  $content .= "Is today a Monday?  " . b2t(is_monday( $today ) ). "<br>";
+  $content .= "Is today a holiday?  " . b2t(is_holiday( $today ) ). "<br>";
+  $content .= "Is today trash day?  " . b2t(is_trash_day($today) ). "<br>";
+  $content .= "Is tomorrow trash day?  " . b2t(is_trash_day($tomorrow) ). "<br>";
+
+  $day_str = "";
+
+  if ( is_trash_day($today) )
+  {
+    $day_str = "TODAY, ";
+  }
+  else if ( is_trash_day($tomorrow) )
+  {
+    $day_str = "TOMORROW, ";
+  }
+
+  $content .= "The next trash day is  " . $day_str . next_trash_day()->format('l, m-d') . "<br>";
+
   $content .= "</p>";
 
   return $content;
 }
 
 
-add_shortcode('riverlea_trash', 'riverlea_is_trash_today');
+add_shortcode('riverlea_trash', 'riverlea_trash_schedule');
 
-function riverlea_well_is_it()
+function b2t($a_bool)
 {
-
-  $today = (new DateTime())->format('m-d');
-  $yesterday = (new DateTime("yesterday"))->format('m-d');
-
-  if ( (is_monday() == "Yes") and (is_holiday($today)=="No") )
+  if ( $a_bool)
   {
     return "Yes";
   }
-  if ( (is_tuesday() == "Yes") and (is_holiday($yesterday)=="Yes") )
+  if ( ! $a_bool)
   {
-    return "Yes";
-  }
-
-  return "NO!";
-}
-
-
-
-function is_monday() {
-
-  if(date('D') == 'Mon')
-  {
-    return "Yes";
-  }
-  else {
     return "No";
   }
 
+  return "?";
 }
 
-function is_tuesday() {
 
-  if(date('D') == 'Tue')
+function next_trash_day() {
+
+  $the_date = new DateTime();
+
+  $is_trash_day = is_trash_day($the_date);
+
+  while ( ! $is_trash_day )
   {
-    return "Yes";
-  }
-  else {
-    return "No";
+      $the_date->add(new DateInterval('P1D'));
+
+      $is_trash_day = is_trash_day($the_date);
   }
 
+  return $the_date;
 }
 
-function is_holiday($a_date_string) {
+
+function is_trash_day( $a_date )
+{
+  $today = $a_date;
+
+  $yesterday = clone $a_date;
+  $yesterday->sub(new DateInterval('P1D'));
+
+  if ( is_monday($today) and is_holiday($today) )
+  {
+    return true;
+  }
+  if ( is_tuesday($today) and is_holiday($yesterday) )
+  {
+    return true;
+  }
+
+  return false;
+}
+
+function is_monday($a_date) {
+
+  return ( ($a_date->format('D')) == 'Mon');
+}
+
+function is_tuesday($a_date) {
+
+  return ( ($a_date->format('D')) == 'Tue');
+}
+
+function is_holiday($a_date) {
+
+  $month_day = $a_date->format('m-d');
 
   // January: New Years - Yes; MLK - NO
   $new_years = "01-01";
@@ -93,14 +128,8 @@ function is_holiday($a_date_string) {
   // December:  Christmas Day - Yes
   $christmas = "12-25";
 
-  if (($a_date_string == $new_years) or ($a_date_string == $presidents_day) or ($a_date_string == $memorial_day) or ($a_date_string==$july_fourth) or
-  ($a_date_string==$labor_day) or ($a_date_string==$thanksgiving_day) or ($a_date_string==$christmas)) {
-
-    return "Yes";
-  }
-  else {
-    return "No";
-  }
+  return  (($month_day == $new_years) or ($month_day == $presidents_day) or ($month_day == $memorial_day) or ($month_day==$july_fourth) or
+  ($month_day==$labor_day) or ($month_day==$thanksgiving_day) or ($month_day==$christmas));
 }
 
 ?>
