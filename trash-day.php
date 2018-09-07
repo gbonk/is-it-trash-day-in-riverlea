@@ -1,6 +1,6 @@
 <?php
 /*
-Plugin Name: Trash Day
+Plugin Name: Riverlea Trash Day
 Description: Determine if a date is trash date.
 Version: 1.0
 Author: Gregory Bonk
@@ -53,7 +53,7 @@ function riverlea_next_trash_date( $atts, $content = null ) {
     $day_str = "TOMORROW, ";
   }
 
-  $content .= "The next trash day is  " . $day_str . next_trash_day()->format('l, m-d') . "<br>";
+  $content .= "The next trash day is  " . $day_str . next_trash_day()->format('l, F d') . "<br>";
 
   $content .= "</p>";
 
