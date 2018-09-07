@@ -15,7 +15,7 @@ Is today Trash Day ?
 
 */
 
-function riverlea_trash_schedule( $atts, $content = null ) {
+function riverlea_trash_debug( $atts, $content = null ) {
 
   $today = new DateTime();
   $tomorrow = new DateTime("tomorrow");
@@ -26,6 +26,21 @@ function riverlea_trash_schedule( $atts, $content = null ) {
   $content .= "Is today a holiday?  " . b2t(is_holiday( $today ) ). "<br>";
   $content .= "Is today trash day?  " . b2t(is_trash_day($today) ). "<br>";
   $content .= "Is tomorrow trash day?  " . b2t(is_trash_day($tomorrow) ). "<br>";
+  $content .= riverlea_next_trash_date() . "<br>";
+
+  $day_str = "";
+
+  $content .= "</p>";
+
+  return $content;
+}
+
+function riverlea_next_trash_date( $atts, $content = null ) {
+
+  $today = new DateTime();
+  $tomorrow = new DateTime("tomorrow");
+
+  $content .= "<p>";
 
   $day_str = "";
 
@@ -46,7 +61,9 @@ function riverlea_trash_schedule( $atts, $content = null ) {
 }
 
 
-add_shortcode('riverlea_trash', 'riverlea_trash_schedule');
+
+add_shortcode('riverlea_trash_debug', 'riverlea_trash_debug');
+add_shortcode('riverlea_next_trash_date', 'riverlea_next_trash_date');
 
 function b2t($a_bool)
 {
@@ -87,7 +104,7 @@ function is_trash_day( $a_date )
   $yesterday = clone $a_date;
   $yesterday->sub(new DateInterval('P1D'));
 
-  if ( is_monday($today) and is_holiday($today) )
+  if ( is_monday($today) and ! is_holiday($today) )
   {
     return true;
   }
