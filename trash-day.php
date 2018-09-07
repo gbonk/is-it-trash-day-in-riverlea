@@ -116,7 +116,6 @@ function is_holiday($a_date) {
   // January: New Years - Yes; MLK - NO
   $new_years = "01-01";
   // February: Presidents Day - NO
-  $presidents_day = (new DateTime("third monday of february this year"))->format('m-d');
   // May:  Memorial Day - Yes
   $memorial_day = (new DateTime("last monday of may this year"))->format('m-d');
   // July:  July 4th - Yes
