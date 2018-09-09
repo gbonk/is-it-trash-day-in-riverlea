@@ -17,11 +17,12 @@ Is today Trash Day ?
 
 function riverlea_trash_debug( $atts, $content = null ) {
 
-  $today = new DateTime();
-  $tomorrow = new DateTime("tomorrow");
+  $today = riverlea_getToday();
+  $tomorrow = riverlea_getTomorrow();
 
   $content .= "<p>";
-  $content .= "Today is " . date("m/d/Y") . ", a " . date("l") . "<br>";
+  $content .= "Today is " . $today->format( DateTime::ATOM ) . ", a " . $today->format("l") . "<br>";
+  $content .= "Tomorrow is " . $tomorrow->format( DateTime::ATOM ) . ", a " . $tomorrow->format("l") . "<br>";
   $content .= "Is today a Monday?  " . b2t(is_monday( $today ) ). "<br>";
   $content .= "Is today a holiday?  " . b2t(is_holiday( $today ) ). "<br>";
   $content .= "Is today trash day?  " . b2t(is_trash_day($today) ). "<br>";
@@ -35,10 +36,27 @@ function riverlea_trash_debug( $atts, $content = null ) {
   return $content;
 }
 
+function riverlea_getToday() {
+
+  $timezone = new DateTimeZone( get_option('gmt_offset') );
+
+  return new DateTime("now",$timezone  );
+}
+
+function riverlea_getTomorrow() {
+
+  $timezone = new DateTimeZone( get_option('gmt_offset') );
+
+  return new DateTime("tomorrow",$timezone  );
+
+}
+
+
+
 function riverlea_next_trash_date( $atts, $content = null ) {
 
-  $today = new DateTime();
-  $tomorrow = new DateTime("tomorrow");
+  $today = riverlea_getToday();
+  $tomorrow = riverlea_getTomorrow();
 
   $content .= "<p>";
 
@@ -82,7 +100,7 @@ function b2t($a_bool)
 
 function next_trash_day() {
 
-  $the_date = new DateTime();
+  $the_date = riverlea_getToday();
 
   $is_trash_day = is_trash_day($the_date);
 
